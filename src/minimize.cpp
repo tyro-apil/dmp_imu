@@ -7,11 +7,11 @@
     #include "Wire.h"
 #endif
 
-
+#define DEBUG
 #define OUTPUT_READABLE_YAWPITCHROLL
 
 #define INTERRUPT_PIN 2  
-#define START_BYTE          0xA4
+#define START_BYTE    0xA4
 
 const int rx_pin = 0;
 const int tx_pin = 1;
@@ -44,6 +44,10 @@ void dmpDataReady() {
 }
 
 void setup(){
+    #ifdef DEBUG
+        #define BAUD_RATE 9600
+        Serial.begin(BAUD_RATE);
+    #endif
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
@@ -94,6 +98,14 @@ void loop() {
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            #ifdef DEBUG
+                Serial.print("ypr\t");
+                Serial.print(ypr[0] * 180/M_PI);
+                Serial.print("\t");
+                Serial.print(ypr[1] * 180/M_PI);
+                Serial.print("\t");
+                Serial.println(ypr[2] * 180/M_PI);               
+            #endif
         #endif
 
         //crc hash
